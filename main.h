@@ -1,44 +1,45 @@
 #ifndef MAIN_H
 #define MAIN_H
-
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdarg.h>
-#include <limits.h>
+#include <stdio.h>
 #include <unistd.h>
+
+#define UNUSED(x) (void)(x)
+#define BUFF_SIZE 1024
+
+/* FLAGS */
+#define F_MINUS 1
+#define F_PLUS 2
+#define F_ZERO 4
+#define F_HASH 8
+#define F_SPACE 16
+
+/* SIZES */
+#define S_LONG 2
+#define S_SHORT 1
+
+/**
+ * struct fmt - Struct op
+ *
+ * @fmt: The format.
+ * @fn: The function associated.
+ */
+struct fmt
+{
+char fmt;
+int (*fn)(va_list, char[], int, int, int, int);
+};
 
 
 /**
- * struct format - match the conversion specifies for printf
- * @id: type char pointer of the specifiers i.e (i,h)
- * @f: type of pointer to function for the conversion specifier
+ * typedef struct fmt fmt_t - Struct op
+ *
+ * @fmt: The format.
+ * @fm_t: The function associated.
  */
+typedef struct fmt fmt_t;
 
-typedef struct format
-{
-char *id;
-int (*f)();
-} convert_match;
-int printf_hex_aux(unsigned long int num);
-int printf_HEX_aux(unsigned int num);
-int printf_exclusive_string(va_list val);
-int printf_HEX(va_list val);
-int printf_hex(va_list val);
-int printf_oct(va_list val);
-int printf_unsigned (va_list args);
-int printf_bin(va_list val);
-int printf_srev(va_list args);
-int printf_rot13(va_list args);
-int printf_int(va_list args);
-int printf_dec(va_list args);
-int _strlen(char *s);
-int *_strcpy(char *dest, char *src);
-int _strlenc(const char *s);
-int printf_37(void);
-int printf_char(va_list val);
-int printf_string(va_list val);
-int _putchar(char c);
-int printf_pointer(va_list val);
 int _printf(const char *format, ...);
-
-#endif /* MAIN_H */
+int handle_print(const char *fmt, int *i,
+va_list list, char buffer[], int flags, int width, int precision, int size);
+#endif /** MAIN_H **/
