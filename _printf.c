@@ -1,60 +1,147 @@
 #include "main.h"
 
-void print_buffer(char buffer[], int *buff_ind);
+/**
+ * print_unknown - the function
+ * @specifier: input
+ * @count: count
+ * Return: none
+ */
+void print_unknown(char specifier, size_t *count)
+{
+write(1, "%", 1);
+write(1, &specifier, 1);
+(*count) += 2;
+}
 
 /**
- * _printf - Printf function
- * @format: format string
- * @...: varying number of arguments
- *
- * Return: number of printed chars
+ * print_binary - the function
+ * @num: input
+ * @count: count
+ * Return: nothing
  */
-int _printf(const char *format, ...)
+void print_binary(unsigned int num, size_t *count)
 {
-int i, printed = 0, printed_chars = 0;
-int flags, width, precision, size, buff_ind = 0;
-va_list list;
-char buffer[BUFF_SIZE];
-if (format == NULL)
-return (-1);
-va_start(list, format);
-for (i = 0; format && format[i] != '\0'; i++)
+char bin_str[32];
+int len = 0;
+int i;
+
+while (num > 0)
 {
-if (format[i] != '%')
+bin_str[len++] = (num % 2) + '0';
+num = num / 2;
+}
+
+if (len == 0)
+bin_str[len++] = '0';
+
+for (i = len - 1; i >= 0; i--)
 {
-buffer[buff_ind++] = format[i];
-if (buff_ind == BUFF_SIZE)
-print_buffer(buffer, &buff_ind);
-printed_chars++;
+write(1, &bin_str[i], 1);
+(*count)++;
+}
+}
+
+/**
+ * print_null_str - the function
+ * @s: input
+ * @count: count
+ * Return: nothing
+ */
+void print_null_str(char *s, size_t *count)
+{
+size_t len = 0;
+
+if (s == NULL)
+{
+write(1, "(null)", 6);
+(*count) += 6;
 }
 else
 {
-print_buffer(buffer, &buff_ind);
-flags = get_flags(format, &i);
-width = get_width(format, &i, list);
-precision = get_precision(format, &i, list);
-size = get_size(format, &i);
-++i;
-printed = handle_print(format, &i, list, buffer,
-flags, width, precision, size);
-if (printed == -1)
-return (-1);
-printed_chars += printed;
+while (s[len] != '\0')
+len++;
+write(1, s, len);
+(*count) += len;
 }
 }
-print_buffer(buffer, &buff_ind);
-va_end(list);
-return (printed_chars);
-}
-/**
- * print_buffer - function
- * @buffer: Array of chars
- * @buff_ind: the length.
- */
-void print_buffer(char buffer[], int *buff_ind)
-{
-if (*buff_ind > 0)
-write(1, &buffer[0], *buff_ind);
 
-*buff_ind = 0;
+/**
+ * print_integer - the function
+ * @num: input
+ * @count: count
+ * Return: noting
+ */
+void print_integer(int num, size_t *count)
+{
+char *num_str;
+int len = 0;
+int i;
+int max_digits;
+
+if (num == 0)
+{
+num_str = malloc(2);
+if (num_str == NULL)
+{
+return;
+}
+num_str[len++] = '0';
+}
+else if (num < 0)
+{
+write(1, "-", 1);
+(*count)++;
+num = -num;
+}
+max_digits = 12;
+num_str = malloc(max_digits);
+if (num_str == NULL)
+{
+return;
+}
+
+while (num > 0)
+{
+num_str[len++] = num % 10 + '0';
+num = num / 10;
+}
+
+for (i = len - 1; i >= 0; i--)
+{
+write(1, &num_str[i], 1);
+(*count)++;
+}
+free(num_str);
+}
+
+/**
+ * _printf - my printf function
+ * @format: pointer to format
+ * @...: various arguments
+ * Return: the count
+ */
+int _printf(const char *format, ...)
+{
+va_list args;
+int count = 0;
+
+va_start(args, format);
+
+if (format == NULL)
+return (-1);
+while (format != '\0')
+{
+if (*format == '%')
+{
+format++;
+len += cases(format, args);
+}
+else
+{
+len += write(STDOUT_FILENO, &(*format), 1);
+}
+format++;
+}
+va_end(args);
+return (count);
 }
