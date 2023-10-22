@@ -122,23 +122,25 @@ free(num_str);
  */
 int _printf(const char *format, ...)
 {
+size_t count = 0;
 va_list args;
-int count = 0;
-
-va_start(args, format);
 
 if (format == NULL)
 return (-1);
-while (format != '\0')
+va_start(args, format);
+while (*format)
 {
-if (*format == '%')
-{
-format++;
-len += cases(format, args);
-}
+if (*format != '%')
+write(1, format, 1), count++;
 else
 {
-len += write(STDOUT_FILENO, &(*format), 1);
+format++;
+if (*format == '\0')
+break;
+if (*format == '%')
+write(1, format, 1), count++;
+else
+handle_format_specifier(*format, args, &count);
 }
 format++;
 }
