@@ -1,98 +1,149 @@
 #include "main.h"
 
 /**
- * _printf - Custom printf function
- * @format: The format string
- *
- * Return: The number of characters printed
+ * print_unknown - the function
+ * @specifier: input
+ * @count: count
+ * Return: none
  */
-int _printf(const char *format, ...)
+void print_unknown(char specifier, size_t *count)
 {
-va_list args;
-int count = 0;
-
-va_start(args, format);
-
-while (*format)
-{
-if (*format == '%')
-{
-format++;
-switch (*format)
-{
-case 'c':
-count += print_char(args, &count);
-break;
-case 's':
-count += print_string(args, &count);
-break;
-case '%':
-count += print_percent(&count);
-break;
-default:
-putchar('%');
-count++;
-putchar(*format);
-count++;
+write(1, "%", 1);
+write(1, &specifier, 1);
+(*count) += 2;
 }
+
+/**
+ * print_binary - the function
+ * @num: input
+ * @count: count
+ * Return: nothing
+ */
+void print_binary(unsigned int num, size_t *count)
+{
+char bin_str[32];
+int len = 0;
+int i;
+
+while (num > 0)
+{
+bin_str[len++] = (num % 2) + '0';
+num = num / 2;
+}
+
+if (len == 0)
+bin_str[len++] = '0';
+
+for (i = len - 1; i >= 0; i--)
+{
+write(1, &bin_str[i], 1);
+(*count)++;
+}
+}
+
+/**
+ * print_null_str - the function
+ * @s: input
+ * @count: count
+ * Return: nothing
+ */
+void print_null_str(char *s, size_t *count)
+{
+size_t len = 0;
+
+if (s == NULL)
+{
+write(1, "(null)", 6);
+(*count) += 6;
 }
 else
 {
-putchar(*format);
-count++;
+while (s[len] != '\0')
+len++;
+write(1, s, len);
+(*count) += len;
+}
 }
 
+/**
+ * print_integer - the function
+ * @num: input
+ * @count: count
+ * Return: noting
+ */
+void print_integer(int num, size_t *count)
+{
+char *num_str;
+int len = 0;
+int i;
+int max_digits;
+
+if (num == 0)
+{
+num_str = malloc(2);
+if (num_str == NULL)
+{
+return;
+}
+num_str[len++] = '0';
+}
+else if (num < 0)
+{
+write(1, "-", 1);
+(*count)++;
+num = -num;
+}
+max_digits = 12;
+num_str = malloc(max_digits);
+if (num_str == NULL)
+{
+return;
+}
+
+while (num > 0)
+{
+num_str[len++] = num % 10 + '0';
+num = num / 10;
+}
+
+for (i = len - 1; i >= 0; i--)
+{
+write(1, &num_str[i], 1);
+(*count)++;
+}
+free(num_str);
+}
+
+/**
+ * _printf - my printf function
+ * @format: pointer to format
+ * @...: various arguments
+ * Return: the count
+ */
+int _printf(const char *format, ...)
+{
+size_t count = 0;
+va_list args;
+
+if (format == NULL)
+return (-1);
+va_start(args, format);
+while (*format)
+{
+if (*format != '%')
+write(1, format, 1), count++;
+else
+{
+format++;
+if (*format == '\0')
+break;
+if (*format == '%')
+write(1, format, 1), count++;
+else
+handle_cases(*format, args, &count);
+}
 format++;
 }
 va_end(args);
 return (count);
-}
-
-/**
- * print_char - Print a character
- * @args: The va_list of arguments
- * @count: Pointer to the character count
- *
- * Return: Number of characters printed
- */
-int print_char(va_list args, int *count)
-{
-char c = va_arg(args, int);
-putchar(c);
-(*count)++;
-return (1);
-}
-
-/**
- * print_string - Print a string
- * @args: The va_list of arguments
- * @count: Pointer to the character count
- *
- * Return: Number of characters printed
- */
-int print_string(va_list args, int *count)
-{
-char *str = va_arg(args, char *);
-if (str == NULL)
-str = "(null)";
-while (*str)
-{
-putchar(*str);
-(*count)++;
-str++;
-}
-return (*count);
-}
-
-/**
- * print_percent - Print a percent character
- * @count: Pointer to the character count
- *
- * Return: Number of characters printed
- */
-int print_percent(int *count)
-{
-putchar('%');
-(*count)++;
-return (1);
 }

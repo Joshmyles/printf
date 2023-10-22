@@ -7,7 +7,7 @@
 
 int _putchar(char c);
 int _printf(const char *format, ...);
-int cases(const *format, va_list args);
+int handle_cases(const *format, va_list args);
 
 void print_unknown_specifier(char specifier, size_t *count);
 void print_null_or_str(char *s, size_t *count);
