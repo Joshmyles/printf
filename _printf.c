@@ -140,7 +140,7 @@ break;
 if (*format == '%')
 write(1, format, 1), count++;
 else
-handle_format_specifier(*format, args, &count);
+cases(*format, args, &count);
 }
 format++;
 }
