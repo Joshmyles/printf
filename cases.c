@@ -99,13 +99,13 @@ write(1, &c, 1);
 }
 
 /**
- * cases - handle all format cases
+ * handle_cases - handle all format cases
  * @specifier: character specifier
  * @args: the input argument
  * @count: count
  * Return: nothong
  */
-void cases(char specifier, va_list args, size_t *count)
+void handle_cases(char specifier, va_list args, size_t *count)
 {
 switch (specifier)
 {
